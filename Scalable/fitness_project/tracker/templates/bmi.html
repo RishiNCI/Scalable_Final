@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Calculate Your BMI</h2>
+    <form id="bmiForm">
+        <div class="mb-3">
+            <label>Weight (kg)</label>
+            <input type="number" class="form-control" id="weight" required>
+        </div>
+        <div class="mb-3">
+            <label>Height (cm)</label>
+            <input type="number" class="form-control" id="height" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Calculate BMI</button>
+    </form>
+    <h4 class="mt-3">Result:</h4>
+    <pre id="bmiResult"></pre>
+</div>
+
+<script>
+    document.getElementById('bmiForm').onsubmit = async function(e){
+        e.preventDefault();
+        const response = await fetch('/api/bmi/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                weight: document.getElementById('weight').value,
+                height: document.getElementById('height').value
+            })
+        });
+        const data = await response.json();
+        document.getElementById('bmiResult').innerText = JSON.stringify(data, null, 2);
+    }
+</script>
+{% endblock %}

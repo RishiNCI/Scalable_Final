@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+
+    <!-- Profile & Goal -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <img src="https://via.placeholder.com/100" class="rounded-circle mb-3" alt="profile">
+                <h4>Welcome, {{ request.user.username }}</h4>
+                <p class="text-muted">Your personal fitness dashboard</p>
+                <hr>
+                <h6>Recommended Weekly Goal:</h6>
+                <p>💡 1500 kcal</p>
+                <div class="progress mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="1500">
+                    <div class="progress-bar" id="goal_progress_bar">0%</div>
+                </div>
+                <p id="goal_text" class="small text-muted">Progress: 0%</p>
+                <hr>
+                <!-- Workout Suggestion -->
+                <h6>💡 Suggested Workout</h6>
+                <p><strong>{{ suggestion.name }}</strong><br>
+                Estimated Burn: {{ suggestion.calories }} kcal</p>
+                <hr>
+                <p><i>"Your only limit is you!"</i></p>
+                <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary & Chart -->
+    <div class="col-md-8">
+
+        <!-- Calories Summary -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h5>Calories Summary</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Total Calories Burned:</strong> <span id="total_calories">0</span> kcal</p>
+                <p><strong>Total Activities:</strong> <span id="total_activities">0</span></p>
+                <canvas id="progressChart" height="100"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Activities -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5>Recent Activities</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Activity</th>
+                            <th>Duration (min)</th>
+                            <th>Calories</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activity_table"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    async function loadDashboard() {
+        const token = localStorage.getItem('access');
+        if (!token) return alert('Please login first.');
+
+        const response = await fetch('/api/tracker/progress/', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!response.ok) {
+            alert('Session expired or invalid token.');
+            window.location.href = '/login/';
+            return;
+        }
+
+        const data = await response.json();
+        const totalCalories = data.total_calories;
+        const activities = data.activities;
+
+        // Stats
+        document.getElementById('total_calories').innerText = totalCalories;
+        document.getElementById('total_activities').innerText = activities.length;
+
+        // Goal Progress
+        const goal = 1500;
+        const percent = Math.min((totalCalories / goal) * 100, 100);
+        document.getElementById('goal_progress_bar').style.width = percent + '%';
+        document.getElementById('goal_progress_bar').innerText = percent.toFixed(1) + '%';
+        document.getElementById('goal_text').innerText = `Progress: ${percent.toFixed(1)}% of 1500 kcal goal`;
+
+        // Chart
+        const labels = activities.map(act => act.date);
+        const calories = activities.map(act => act.calories_burned);
+
+        new Chart(document.getElementById('progressChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Calories Burned',
+                    data: calories,
+                    backgroundColor: '#00c6ff'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Activities Table
+        let tableHTML = '';
+        activities.slice(-5).reverse().forEach(act => {
+            tableHTML += `<tr>
+                            <td>${act.date}</td>
+                            <td>${act.activity_type}</td>
+                            <td>${act.duration_minutes}</td>
+                            <td>${act.calories_burned}</td>
+                          </tr>`;
+        });
+        document.getElementById('activity_table').innerHTML = tableHTML;
+    }
+
+    function logout() {
+        localStorage.removeItem('access');
+        localStorage.removeItem('refresh');
+        alert("Logged out successfully.");
+        window.location.href = "/login/";
+    }
+
+    loadDashboard();
+</script>
+{% endblock %}

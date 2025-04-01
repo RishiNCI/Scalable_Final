@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5 text-center">
+    <h1>Welcome to Fitness Tracker</h1>
+    <p class="lead">Manage your fitness activities, calculate BMI, and track your calories.</p>
+    <hr>
+    <div class="mt-4">
+        <a href="/register/" class="btn btn-primary m-2">Register</a>
+        <a href="/login/" class="btn btn-secondary m-2">Login</a>
+        <a href="/dashboard/" class="btn btn-success m-2">Dashboard</a>
+        <a href="/bmi/" class="btn btn-info m-2">BMI Calculator</a>
+        <a href="/activity-log/" class="btn btn-warning m-2">Log Activity</a>
+        <a href="/progress-chart/" class="btn btn-dark m-2">View Progress (Chart)</a>
+    </div>
+</div>
+{% endblock %}
