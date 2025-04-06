@@ -5,7 +5,7 @@ from .models import Activity
 from .serializers import ActivitySerializer, UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import HttpResponse
-
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 
 def home(request):
@@ -41,8 +41,7 @@ def get_workout_suggestion():
     ]
     return random.choice(workouts)
 
-
-
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register_user(request):
@@ -52,6 +51,7 @@ def register_user(request):
         return Response({"msg": "User registered successfully"})
     return Response(serializer.errors)
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def calculate_bmi(request):
@@ -60,6 +60,7 @@ def calculate_bmi(request):
     bmi = weight / ((height / 100) ** 2)
     return Response({'bmi': round(bmi, 2)})
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def log_activity(request):
@@ -69,6 +70,7 @@ def log_activity(request):
         return Response({'status': 'Activity logged'})
     return Response(serializer.errors)
 
+@csrf_exempt
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_progress(request):

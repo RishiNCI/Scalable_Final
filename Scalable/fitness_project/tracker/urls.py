@@ -12,11 +12,11 @@ urlpatterns = [
     path('progress-chart/', views.progress_chart),
 
     # APIs
-    path('api/register/', views.register_user),
-    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/bmi/', views.calculate_bmi),
-    path('api/tracker/log/', views.log_activity),
-    path('api/tracker/progress/', views.get_progress),
+    path('register/', views.register_user),
+    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('bmi/', views.calculate_bmi),
+    path('tracker/log/', views.log_activity),
+    path('tracker/progress/', views.get_progress),
 ]
 

@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'tracker',
 ]
 
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -134,4 +136,10 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',  # For development, you can tighten later
+    ),
 }
+
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://3.248.201.247']  # include your frontend or clients
+
